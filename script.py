@@ -1,16 +1,12 @@
 import random
 from datacenter.models import Schoolkid, Mark, Chastisement
 from datacenter.models import Lesson, Commendation
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from commendation_variations import commendations
+from commendation_variations import COMMENDATIONS
 
 
 def fix_marks(student):
     student_marks = Mark.objects.filter(schoolkid=student, points__in=[2, 3])
-    for marks in student_marks:
-        marks.points = random.randint(4, 5)
-        marks.save()
-    return student_marks
+    return student_marks.update(points=random.randint(4, 5))
 
 
 def remove_chastisements(student):
@@ -26,7 +22,7 @@ def create_commendation(student, lesson):
     ).order_by("?").first()
 
     return Commendation.objects.create(
-               text=random.choice(commendations),
+               text=random.choice(COMMENDATIONS),
                created=which_lesson.date,
                schoolkid=student,
                subject=which_lesson.subject,
@@ -43,10 +39,10 @@ def main():
         remove_chastisements(student)
         create_commendation(student, lesson)
         return print("Красный диплом не за горами :-)")
-    except ObjectDoesNotExist:
+    except Schoolkid.DoesNotExist:
         return print("Неправильно ввели ФИО ученика! "
                      "Проверьте формат ввода: Иванов Иван Иванович")
-    except MultipleObjectsReturned:
+    except Schoolkid.MultipleObjectsReturned:
         return print("Таких в списке несколько! Уточните ФИО ученика! "
                      "Проверьте формат ввода: Иванов Иван Иванович")
     except AttributeError:

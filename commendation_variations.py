@@ -1,4 +1,4 @@
-commendations = (
+COMMENDATIONS = (
     "Молодец!", 
     "Отлично!", 
     "Хорошо!", 
